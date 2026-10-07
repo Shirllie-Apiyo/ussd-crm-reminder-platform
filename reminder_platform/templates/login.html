@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Sign in · {{ brand_name }}{% endblock %}
+{% block content %}
+<section class="login-wrap">
+  <div class="login-art">
+    <span class="eyebrow light">USSD SIGN-UP FOLLOW-UP</span>
+    <h1>Keep every<br>sign-up moving.</h1>
+    <p>One clear view of customer progress, consent, and the reminders that help them finish.</p>
+    <div class="milestone-strip"><span>DAY 07</span><i></i><span>DAY 30</span><i></i><span>DAY 60</span></div>
+  </div>
+  <div class="login-card">
+    <span class="eyebrow">TEAM ACCESS</span>
+    <h2>Welcome back</h2>
+    <p class="muted">Sign in to your customer signup workspace.</p>
+    <form method="post" class="form-stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Username<input name="username" autocomplete="username" required autofocus></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="primary-button" type="submit">Sign in <span>→</span></button>
+    </form>
+    <p class="small muted login-note">Admin credentials are configured in your local environment file.</p>
+  </div>
+</section>
+{% endblock %}
+

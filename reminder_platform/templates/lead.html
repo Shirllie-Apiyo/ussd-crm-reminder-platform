@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{{ lead.full_name or lead.phone }} · {{ brand_name }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('dashboard') }}">← Back to pipeline</a>
+<section class="detail-heading"><div><span class="eyebrow">CUSTOMER RECORD · #{{ lead.id }}</span><h1>{{ lead.full_name or 'Name pending' }}</h1><p>{{ lead.phone }}{% if lead.email %} · {{ lead.email }}{% endif %}</p></div><span class="status-pill {{ lead.status }}">{{ lead.status.replace('_',' ') }}</span></section>
+<section class="detail-grid">
+  <article class="panel detail-panel"><span class="eyebrow">SIGN-UP DETAILS</span><h2>Customer progress</h2>
+    <dl class="detail-list"><div><dt>USSD started</dt><dd>{{ lead.started_at|localdate }}</dd></div><div><dt>Last activity</dt><dd>{{ lead.last_activity_at|localdate }}</dd></div><div><dt>Email</dt><dd>{{ lead.email or 'Not provided' }}</dd></div><div><dt>Email consent</dt><dd>{{ 'Yes' if lead.email_opt_in else 'No' }}{% if lead.consented_at %} · {{ lead.consented_at|localdate }}{% endif %}</dd></div><div><dt>Status</dt><dd>{{ lead.status.replace('_',' ') }}</dd></div></dl>
+    {% if lead.status != 'completed' %}<form method="post" action="{{ url_for('complete_lead', lead_id=lead.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="primary-button" type="submit">Mark sign-up complete <span>✓</span></button></form>{% else %}<div class="complete-banner">✓ Sign-up completed {{ lead.completed_at|localdate }}</div>{% endif %}
+  </article>
+  <article class="panel detail-panel"><span class="eyebrow">AUTOMATED FOLLOW-UP</span><h2>Reminder timeline</h2><div class="timeline">
+    {% for day in [7,30,60] %}{% set reminder = reminders|selectattr('day_after_start','equalto',day)|first %}
+    <div class="timeline-item"><div class="timeline-marker {{ reminder.status if reminder else '' }}">{% if reminder and reminder.status in ['sent','previewed'] %}✓{% else %}{{ day }}{% endif %}</div><div class="timeline-copy"><strong>Day {{ day }} reminder</strong><span>Due {{ (lead.started_at|adddays(day))|localdate }}</span>{% if reminder %}<span class="timeline-status {{ reminder.status }}">{{ reminder.status }}{% if reminder.delivered_at %} · {{ reminder.delivered_at|localdate }}{% elif reminder.retry_at %} · retry {{ reminder.retry_at|localdate }}{% endif %}</span>{% elif not lead.email_opt_in %}<span class="timeline-status muted">Waiting for email consent</span>{% elif lead.status == 'completed' %}<span class="timeline-status muted">Stopped · signup complete</span>{% endif %}</div></div>
+    {% endfor %}
+  </div></article>
+</section>
+{% endblock %}
+

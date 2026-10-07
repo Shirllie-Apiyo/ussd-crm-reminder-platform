@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block title %}Email preferences · {{ brand_name }}{% endblock %}
+{% block content %}<section class="public-card"><span class="eyebrow">EMAIL PREFERENCES</span><h1>Stop sign-up reminders?</h1><p class="muted">{% if lead.full_name %}{{ lead.full_name }}, {% endif %}you can stop reminder emails at any time. This will not affect your sign-up.</p><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="primary-button" type="submit">Unsubscribe from reminders</button></form></section>{% endblock %}
+

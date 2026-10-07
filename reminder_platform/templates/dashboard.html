@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Signup pipeline · {{ brand_name }}{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">CUSTOMER OPERATIONS</span><h1>Signup pipeline</h1><p>Track customers who started over USSD and nudge opted-in customers to finish.</p></div>
+  <div class="live-pill"><span></span> AUTOMATION ACTIVE</div>
+</section>
+<section class="stats-grid">
+  <article class="stat-card"><span class="stat-label">All customers</span><strong>{{ stats.total }}</strong><span class="stat-foot">USSD sign-up records</span></article>
+  <article class="stat-card"><span class="stat-label">In progress</span><strong>{{ stats.active }}</strong><span class="stat-foot">Still to complete</span></article>
+  <article class="stat-card accent-stat"><span class="stat-label">Email eligible</span><strong>{{ stats.eligible }}</strong><span class="stat-foot">Consent captured</span></article>
+  <article class="stat-card"><span class="stat-label">Email reminders</span><strong>{{ stats.sent + stats.previewed }}</strong><span class="stat-foot">{{ stats.sent }} sent · {{ stats.previewed }} previewed</span></article>
+</section>
+<section class="panel">
+  <div class="panel-head"><div><span class="eyebrow">CRM RECORDS</span><h2>Customer follow-up</h2></div>
+    <form class="search-form" method="get"><label class="sr-only" for="q">Search customers</label><input id="q" name="q" value="{{ search }}" placeholder="Search name, phone or email"><button class="search-button" type="submit" aria-label="Search">⌕</button></form>
+  </div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Customer</th><th>Phone</th><th>Progress</th><th>Email reminders</th><th>Next touch</th><th></th></tr></thead>
+    <tbody>
+    {% for lead in leads %}
+      <tr>
+        <td><a class="customer-link" href="{{ url_for('lead_detail', lead_id=lead.id) }}">{{ lead.full_name or 'Name pending' }}</a><span class="subline">{{ lead.email or 'Email not captured' }}</span></td>
+        <td class="mono">{{ lead.phone }}</td>
+        <td><span class="status-pill {{ lead.status }}">{{ lead.status.replace('_',' ') }}</span></td>
+        <td><span class="count-chip">{{ lead.reminder_count }} / 3</span><span class="subline">{% if lead.email_opt_in %}Opted in{% else %}No email consent{% endif %}</span></td>
+        <td class="next-touch">{% if lead.status == 'completed' %}<span class="muted">Completed</span>{% elif not lead.email_opt_in %}<span class="muted">No email consent</span>{% elif lead.next_reminder %}{{ lead.next_reminder|localdate }}{% else %}<span class="muted">{{ lead.started_at|nextmilestone }}</span>{% endif %}</td>
+        <td><a class="arrow-link" href="{{ url_for('lead_detail', lead_id=lead.id) }}" aria-label="Open customer">↗</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="empty-cell"><span class="empty-icon">◎</span><strong>No customer records yet</strong><span>USSD sign-ups will appear here automatically.</span></td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <div class="table-foot">Showing up to 200 records · Reminder schedule: day 7, day 30 and day 60 after first USSD contact</div>
+</section>
+<section class="automation-note"><div class="note-icon">✳</div><div><strong>Follow-ups are automatic</strong><p>Only customers with an email address and recorded consent receive reminders. Completing a sign-up or unsubscribing stops future email reminders. <b>{% if email_backend == 'smtp' %}SMTP email delivery is enabled.{% else %}Console preview mode is active; no emails are delivered.{% endif %}</b></p></div><span class="automation-state">RUNNING</span></section>
+{% endblock %}
+

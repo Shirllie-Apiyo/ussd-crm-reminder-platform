@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ brand_name }} CRM{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="shell">
+    {% if session.get('admin_authenticated') %}
+    <header class="topbar">
+      <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">K</span><span>{{ brand_name }}<small>CRM AUTOMATION</small></span></a>
+      <form method="post" action="{{ url_for('logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="quiet-button" type="submit">Sign out</button>
+      </form>
+    </header>
+    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    <main>{% block content %}{% endblock %}</main>
+    <footer class="footer">{{ brand_name }} · Signup follow-up workspace</footer>
+  </div>
+</body>
+</html>
+
